@@ -1,6 +1,5 @@
 package ru.bookingsystem.exception;
 
-import jakarta.persistence.Entity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
