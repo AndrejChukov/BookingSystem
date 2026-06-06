@@ -3,7 +3,6 @@ package ru.bookingsystem.controller;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import ru.bookingsystem.entity.Room;
-import ru.bookingsystem.repository.RoomRepository;
 import ru.bookingsystem.service.RoomService;
 
 import java.util.List;
