@@ -2,6 +2,7 @@ package ru.bookingsystem.controller;
 
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import ru.bookingsystem.dto.request.EquipmentRequestDTO;
 import ru.bookingsystem.entity.Equipment;
 import ru.bookingsystem.service.EquipmentService;
 
@@ -19,9 +20,24 @@ public class EquipmentController {
         return equipmentService.getAllEquipments();
     }
 
+    @GetMapping("/equipment/{id}")
+    public Equipment getEquipmentById(@PathVariable("id") Long id) {
+        return equipmentService.getEquipmentById(id);
+    }
+
     @PostMapping("/equipment")
     public Equipment createEquipment(@RequestBody Equipment equipment) {
         return equipmentService.createEquipment(equipment);
+    }
+
+    @PutMapping("/equipment")
+    public void updateEquipment(@RequestBody EquipmentRequestDTO equipmentRequest) {
+        equipmentService.updateEquipment(equipmentRequest);
+    }
+
+    @DeleteMapping("/equipment/{id}")
+    public void deleteEquipment(@PathVariable Long id) {
+        equipmentService.deleteEquipment(id);
     }
 
 }

@@ -6,4 +6,5 @@ import ru.bookingsystem.entity.Equipment;
 
 @Repository
 public interface EquipmentRepository extends JpaRepository<Equipment, Long> {
+    void deleteById(Long id);
 }
