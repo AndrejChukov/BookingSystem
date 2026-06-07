@@ -1,3 +1,7 @@
 package ru.bookingsystem.dto.request;
 
-public record EquipmentRequestDTO(Long id, String name) {}
+import jakarta.validation.constraints.NotBlank;
+
+public record EquipmentRequestDTO(
+        @NotBlank(message = "Equipment name cannot be empty or just spaces")
+        String name) {}
