@@ -3,6 +3,7 @@ package ru.bookingsystem.entity;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.time.Instant;
 import java.util.List;
 
 @Data
@@ -16,12 +17,15 @@ public class Room {
     private int capacity;
 
     @ManyToMany
-    private List<Equipment> equipment;
+    private List<Equipment> equipments;
 
     @Enumerated(EnumType.STRING)
     private Status status;
 
-    enum Status {
+    private Instant createdAt = Instant.now();
+    private Instant updatedAt = Instant.now();
+
+    public enum Status {
         AVAILABLE, OCCUPIED, MAINTENANCE
     }
 }
