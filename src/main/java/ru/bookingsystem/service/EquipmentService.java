@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.bookingsystem.dto.request.EquipmentRequestDTO;
 import ru.bookingsystem.entity.Equipment;
 import ru.bookingsystem.exception.EntityNotFoundException;
+import ru.bookingsystem.mapper.EquipmentMapper;
 import ru.bookingsystem.repository.EquipmentRepository;
 
 import java.time.Instant;
@@ -16,6 +17,7 @@ import java.util.List;
 public class EquipmentService {
 
     private final EquipmentRepository equipmentRepository;
+    private final EquipmentMapper equipmentMapper;
 
     @Transactional
     public List<Equipment> getAllEquipments() {
@@ -29,22 +31,22 @@ public class EquipmentService {
     }
 
     @Transactional
-    public Equipment createEquipment(Equipment equipment) {
-        return equipmentRepository.save(equipment);
+    public Equipment createEquipment(EquipmentRequestDTO equipmentRequest) {
+        Equipment newEquipment = equipmentMapper.toEntity(equipmentRequest);
+        return equipmentRepository.save(newEquipment);
     }
 
     @Transactional
-    public void updateEquipment(EquipmentRequestDTO equipmentRequest) {
-        Equipment updatedEquipment = new Equipment();
-        updatedEquipment.setId(equipmentRequest.id());
-        updatedEquipment.setName(equipmentRequest.name());
-        equipmentRepository.findById(equipmentRequest.id())
+    public void updateEquipment(EquipmentRequestDTO equipmentRequest, Long id) {
+        Equipment updatedEquipment = equipmentMapper.toEntity(equipmentRequest);
+        equipmentRepository.findById(id)
                 .map(e -> {
+                    updatedEquipment.setId(id);
                     updatedEquipment.setCreatedAt(e.getCreatedAt());
                     updatedEquipment.setUpdatedAt(Instant.now());
                     return equipmentRepository.save(updatedEquipment);
                 }).orElseThrow(() -> new EntityNotFoundException("Equipment with ID: " +
-                                equipmentRequest.id() + " not found"));
+                                id + " not found"));
     }
 
     @Transactional

@@ -1,5 +1,6 @@
 package ru.bookingsystem.controller;
 
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import ru.bookingsystem.dto.request.EquipmentRequestDTO;
@@ -26,13 +27,13 @@ public class EquipmentController {
     }
 
     @PostMapping("/equipment")
-    public Equipment createEquipment(@RequestBody Equipment equipment) {
-        return equipmentService.createEquipment(equipment);
+    public Equipment createEquipment(@Valid @RequestBody EquipmentRequestDTO equipmentRequest) {
+        return equipmentService.createEquipment(equipmentRequest);
     }
 
-    @PutMapping("/equipment")
-    public void updateEquipment(@RequestBody EquipmentRequestDTO equipmentRequest) {
-        equipmentService.updateEquipment(equipmentRequest);
+    @PutMapping("/equipment/{id}")
+    public void updateEquipment(@Valid @RequestBody EquipmentRequestDTO equipmentRequest, @PathVariable("id") Long id) {
+        equipmentService.updateEquipment(equipmentRequest, id);
     }
 
     @DeleteMapping("/equipment/{id}")
