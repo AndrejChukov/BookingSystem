@@ -29,7 +29,7 @@ class EquipmentServiceTest {
     @Mock EquipmentMapper equipmentMapper;
     @InjectMocks EquipmentService equipmentService;
 
-    @Captor ArgumentCaptor<Equipment> taskCaptor;
+    @Captor ArgumentCaptor<Equipment> equipmentCaptor;
 
     private final Long EQUIPMENT_ID = 1L;
     private EquipmentRequestDTO mockEquipmentRequest;
@@ -104,12 +104,12 @@ class EquipmentServiceTest {
 
         equipmentService.updateEquipment(updateEquipmentRequest, EQUIPMENT_ID);
 
-        verify(equipmentRepository).save(taskCaptor.capture());
-        Equipment equipmentFromCaptor = taskCaptor.getValue();
+        verify(equipmentRepository).save(equipmentCaptor.capture());
+        Equipment captoredEquipment = equipmentCaptor.getValue();
 
-        assertNotNull(equipmentFromCaptor);
-        assertEquals(updateEquipmentRequest.name(), equipmentFromCaptor.getName());
-        assertEquals(EQUIPMENT_ID, equipmentFromCaptor.getId());
+        assertNotNull(captoredEquipment);
+        assertEquals(updateEquipmentRequest.name(), captoredEquipment.getName());
+        assertEquals(EQUIPMENT_ID, captoredEquipment.getId());
 
         verify(equipmentMapper).toEntity(updateEquipmentRequest);
         verify(equipmentRepository).findById(anyLong());
