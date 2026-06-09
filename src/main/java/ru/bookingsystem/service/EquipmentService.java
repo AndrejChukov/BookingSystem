@@ -38,15 +38,13 @@ public class EquipmentService {
 
     @Transactional
     public void updateEquipment(EquipmentRequestDTO equipmentRequest, Long id) {
-        Equipment updatedEquipment = equipmentMapper.toEntity(equipmentRequest);
-        equipmentRepository.findById(id)
-                .map(e -> {
-                    updatedEquipment.setId(id);
-                    updatedEquipment.setCreatedAt(e.getCreatedAt());
-                    updatedEquipment.setUpdatedAt(Instant.now());
-                    return equipmentRepository.save(updatedEquipment);
-                }).orElseThrow(() -> new EntityNotFoundException("Equipment with ID: " +
-                                id + " not found"));
+        Equipment existingEquipment = equipmentRepository.findById(id).orElseThrow(() ->
+                new EntityNotFoundException("Equipment with ID: " + id + " not found"));
+
+        equipmentMapper.updateEntityFromDto(equipmentRequest, existingEquipment);
+        existingEquipment.setUpdatedAt(Instant.now());
+
+        equipmentRepository.save(existingEquipment);
     }
 
     @Transactional

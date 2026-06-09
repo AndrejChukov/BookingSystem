@@ -42,16 +42,15 @@ public class RoomService {
 
     @Transactional
     public void updateRoom(RoomRequestDTO roomRequest, Long id) {
-        Room updatedRoom = roomMapper.toEntity(roomRequest);
-        assignEquipment(roomRequest, updatedRoom);
-        roomRepository.findById(id)
-                .map(r -> {
-                    updatedRoom.setId(id);
-                    updatedRoom.setUpdatedAt(Instant.now());
-                    updatedRoom.setCreatedAt(r.getCreatedAt());
-                    return roomRepository.save(updatedRoom);
-                })
-                .orElseThrow(() -> new EntityNotFoundException("Room with ID: " + id + " not found"));
+        Room existingRoom = roomRepository.findById(id).orElseThrow(() ->
+                new EntityNotFoundException("Room with ID: " + id + " not found"));
+
+        roomMapper.updateEntityFromDto(roomRequest, existingRoom);
+        existingRoom.setUpdatedAt(Instant.now());
+
+        assignEquipment(roomRequest, existingRoom);
+
+        roomRepository.save(existingRoom);
     }
 
     @Transactional
