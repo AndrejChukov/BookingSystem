@@ -109,41 +109,32 @@ class RoomServiceTest {
 
     @Test
     void updateRoom_Success() {
-        Room updatedRoom = new Room();
-        updatedRoom.setId(2L);
+        RoomRequestDTO updatedRoom =
+                new RoomRequestDTO("updated name", 100, List.of(1L), Room.Status.AVAILABLE);
 
-        when(roomMapper.toEntity(any(RoomRequestDTO.class))).thenReturn(updatedRoom);
-        when(equipmentRepository.findAllById(anyList())).thenReturn(equipments);
-        when(roomRepository.findById(anyLong())).thenReturn(Optional.of(room));
-        when(roomRepository.save(any(Room.class))).thenReturn(updatedRoom);
+        when(roomRepository.findById(ROOM_ID)).thenReturn(Optional.of(room));
+        when(roomRepository.save(any(Room.class))).thenReturn(room);
 
-        roomService.updateRoom(roomRequest, ROOM_ID);
+        roomService.updateRoom(updatedRoom, ROOM_ID);
+
         verify(roomRepository).save(roomCaptor.capture());
         Room capturedRoom = roomCaptor.getValue();
 
         assertNotNull(capturedRoom);
-        assertEquals(updatedRoom.getName(), capturedRoom.getName());
-        assertEquals(equipments, capturedRoom.getEquipmentList());
-        assertNotEquals(room.getName(), capturedRoom.getName());
-        assertEquals(updatedRoom.getId(), capturedRoom.getId());
+        assertEquals(ROOM_ID, capturedRoom.getId());
 
-        verify(roomMapper).toEntity(any(RoomRequestDTO.class));
-        verify(equipmentRepository).findAllById(anyList());
+        verify(roomMapper).updateEntityFromDto(updatedRoom, room);
         verify(roomRepository).findById(anyLong());
         verify(roomRepository).save(any(Room.class));
     }
 
     @Test
     void updateRoom_ShouldThrow_EntityNotFoundException() {
-        when(roomMapper.toEntity(any(RoomRequestDTO.class))).thenReturn(room);
-        when(equipmentRepository.findAllById(anyList())).thenReturn(equipments);
-        when(roomRepository.findById(anyLong())).thenReturn(Optional.empty());
+        when(roomRepository.findById(ROOM_ID)).thenReturn(Optional.empty());
 
         assertThrows(EntityNotFoundException.class, () -> roomService.updateRoom(roomRequest, ROOM_ID));
 
         verify(roomRepository, never()).save(any(Room.class));
-        verify(roomMapper).toEntity(any(RoomRequestDTO.class));
-        verify(equipmentRepository).findAllById((anyList()));
         verify(roomRepository).findById(anyLong());
     }
 

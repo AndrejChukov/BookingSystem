@@ -96,10 +96,8 @@ class EquipmentServiceTest {
     @Test
     void updateEquipment_Success() {
         EquipmentRequestDTO updateEquipmentRequest = new EquipmentRequestDTO("Projector");
-        equipment.setName(updateEquipmentRequest.name());
 
-        when(equipmentMapper.toEntity(updateEquipmentRequest)).thenReturn(equipment);
-        when(equipmentRepository.findById(anyLong())).thenReturn(Optional.of(equipment));
+        when(equipmentRepository.findById(EQUIPMENT_ID)).thenReturn(Optional.of(equipment));
         when(equipmentRepository.save(equipment)).thenReturn(equipment);
 
         equipmentService.updateEquipment(updateEquipmentRequest, EQUIPMENT_ID);
@@ -108,17 +106,15 @@ class EquipmentServiceTest {
         Equipment captoredEquipment = equipmentCaptor.getValue();
 
         assertNotNull(captoredEquipment);
-        assertEquals(updateEquipmentRequest.name(), captoredEquipment.getName());
         assertEquals(EQUIPMENT_ID, captoredEquipment.getId());
 
-        verify(equipmentMapper).toEntity(updateEquipmentRequest);
+        verify(equipmentMapper).updateEntityFromDto(updateEquipmentRequest, equipment);
         verify(equipmentRepository).findById(anyLong());
     }
 
     @Test
     void updateEquipment_ShouldThrow_EntityNotFoundException() {
-        when(equipmentMapper.toEntity(mockEquipmentRequest)).thenReturn(equipment);
-        when(equipmentRepository.findById(anyLong())).thenReturn(Optional.empty());
+        when(equipmentRepository.findById(EQUIPMENT_ID)).thenReturn(Optional.empty());
 
         assertThrows(EntityNotFoundException.class,
                 () -> equipmentService.updateEquipment(mockEquipmentRequest, EQUIPMENT_ID));
