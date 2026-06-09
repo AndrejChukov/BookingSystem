@@ -17,7 +17,7 @@ public class Room {
     private int capacity;
 
     @ManyToMany
-    private List<Equipment> equipments;
+    private List<Equipment> equipmentList;
 
     @Enumerated(EnumType.STRING)
     private Status status;

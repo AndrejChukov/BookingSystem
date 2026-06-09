@@ -1,7 +1,6 @@
 package ru.bookingsystem.service;
 
-import jakarta.validation.Valid;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.bookingsystem.dto.request.RoomRequestDTO;
@@ -16,19 +15,19 @@ import java.time.Instant;
 import java.util.List;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class RoomService {
 
     private final RoomRepository roomRepository;
     private final EquipmentRepository equipmentRepository;
     private final RoomMapper roomMapper;
 
-    @Transactional
+    @Transactional(readOnly = true)
     public List<Room> getAllRooms() {
         return roomRepository.findAll();
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public Room getRoomById(Long id) {
         return roomRepository.findById(id).orElseThrow(() ->
                 new EntityNotFoundException("Room with ID: " + id + " not found"));
@@ -37,14 +36,14 @@ public class RoomService {
     @Transactional
     public Room createRoom(RoomRequestDTO roomRequest) {
         Room newRoom = roomMapper.toEntity(roomRequest);
-        setEquipments(roomRequest, newRoom);
+        assignEquipment(roomRequest, newRoom);
         return roomRepository.save(newRoom);
     }
 
     @Transactional
     public void updateRoom(RoomRequestDTO roomRequest, Long id) {
         Room updatedRoom = roomMapper.toEntity(roomRequest);
-        setEquipments(roomRequest, updatedRoom);
+        assignEquipment(roomRequest, updatedRoom);
         roomRepository.findById(id)
                 .map(r -> {
                     updatedRoom.setId(id);
@@ -57,13 +56,17 @@ public class RoomService {
 
     @Transactional
     public void deleteRoom(Long id) {
-        roomRepository.deleteById(id);
+        if (roomRepository.existsById(id)) {
+            roomRepository.deleteById(id);
+        } else {
+            throw new EntityNotFoundException("Room with ID: " + id + " not found");
+        }
     }
 
-    public void setEquipments(RoomRequestDTO roomRequest, Room newRoom) {
+    private void assignEquipment(RoomRequestDTO roomRequest, Room newRoom) {
         if (roomRequest.equipmentIds() != null && !roomRequest.equipmentIds().isEmpty()) {
-            List<Equipment> equipments = equipmentRepository.findAllById(roomRequest.equipmentIds());
-            newRoom.setEquipments(equipments);
+            List<Equipment> equipmentList = equipmentRepository.findAllById(roomRequest.equipmentIds());
+            newRoom.setEquipmentList(equipmentList);
         }
     }
 
