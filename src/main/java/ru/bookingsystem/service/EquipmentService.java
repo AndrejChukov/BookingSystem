@@ -1,6 +1,6 @@
 package ru.bookingsystem.service;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.bookingsystem.dto.request.EquipmentRequestDTO;
@@ -13,18 +13,18 @@ import java.time.Instant;
 import java.util.List;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class EquipmentService {
 
     private final EquipmentRepository equipmentRepository;
     private final EquipmentMapper equipmentMapper;
 
-    @Transactional
+    @Transactional(readOnly = true)
     public List<Equipment> getAllEquipments() {
         return equipmentRepository.findAll();
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public Equipment getEquipmentById(Long id) {
         return equipmentRepository.findById(id).orElseThrow(() ->
                 new EntityNotFoundException("Equipment with ID: " + id + " not found"));
