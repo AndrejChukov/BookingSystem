@@ -17,8 +17,12 @@ public class RoomController {
     private final RoomService roomService;
 
     @GetMapping("/rooms")
-    public List<Room> getAllRooms() {
-        return roomService.getAllRooms();
+    public List<Room> getAllRooms(
+            @RequestParam(required = false) Room.Status status,
+            @RequestParam(defaultValue = "createdAt") String sortBy,
+            @RequestParam(defaultValue = "desc") String direction
+    ) {
+        return roomService.getAllRoomsSorted(status, sortBy, direction);
     }
 
     @GetMapping("/room/{id}")

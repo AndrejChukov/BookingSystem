@@ -1,6 +1,7 @@
 package ru.bookingsystem.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.bookingsystem.dto.request.RoomRequestDTO;
@@ -23,8 +24,15 @@ public class RoomService {
     private final RoomMapper roomMapper;
 
     @Transactional(readOnly = true)
-    public List<Room> getAllRooms() {
-        return roomRepository.findAll();
+    public List<Room> getAllRoomsSorted(Room.Status status, String sortedBy, String direction) {
+        Sort.Direction dir = (direction.equalsIgnoreCase("desc")) ? Sort.Direction.DESC : Sort.Direction.ASC;
+        Sort sort = Sort.by(dir, sortedBy);
+
+        if (status == null) {
+            roomRepository.findAll(sort);
+        }
+
+        return roomRepository.findAllByStatus(status, sort);
     }
 
     @Transactional(readOnly = true)
