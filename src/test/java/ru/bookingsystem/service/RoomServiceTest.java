@@ -8,6 +8,7 @@ import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Sort;
 import ru.bookingsystem.dto.request.RoomRequestDTO;
 import ru.bookingsystem.entity.Equipment;
 import ru.bookingsystem.entity.Room;
@@ -59,15 +60,16 @@ class RoomServiceTest {
     @Test
     void getAllRooms() {
         List<Room> rooms = Collections.singletonList(room);
-        when(roomRepository.findAll()).thenReturn(rooms);
+        when(roomRepository.findAll(any(Sort.class))).thenReturn(rooms);
 
-        List<Room> response = roomService.getAllRooms();
+        List<Room> response = roomService.getAllRoomsSorted(Room.Status.AVAILABLE, "createdAt", "desc");
 
         assertNotNull(response);
         assertEquals(1, response.size());
         assertEquals(room, response.get(0));
 
-        verify(roomRepository).findAll();
+        verify(roomRepository).findAllByStatus(Room.Status.AVAILABLE,
+                        Sort.by(Sort.Direction.DESC, "createdAt"));
     }
 
     @Test
