@@ -60,7 +60,7 @@ class RoomServiceTest {
     @Test
     void getAllRooms() {
         List<Room> rooms = Collections.singletonList(room);
-        when(roomRepository.findAll(any(Sort.class))).thenReturn(rooms);
+        when(roomRepository.findAllByStatus(any(Room.Status.class), any(Sort.class))).thenReturn(rooms);
 
         List<Room> response = roomService.getAllRoomsSorted(Room.Status.AVAILABLE, "createdAt", "desc");
 
