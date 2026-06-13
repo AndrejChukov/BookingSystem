@@ -1,5 +1,6 @@
 package ru.bookingsystem.exception;
 
+import org.springframework.data.mapping.PropertyReferenceException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -16,6 +17,18 @@ public class GlobalExceptionHandler {
                 Instant.now(),
                 HttpStatus.NOT_FOUND.value(),
                 "Entity not found",
+                ex.getMessage()
+        );
+
+        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(PropertyReferenceException.class)
+    public ResponseEntity<ErrorResponse> handlePropertyReference(PropertyReferenceException ex) {
+        ErrorResponse error = new ErrorResponse(
+                Instant.now(),
+                HttpStatus.NOT_FOUND.value(),
+                "wrong property",
                 ex.getMessage()
         );
 

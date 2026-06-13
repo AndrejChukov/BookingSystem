@@ -4,6 +4,8 @@ import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import ru.bookingsystem.dto.request.RoomRequestDTO;
+import ru.bookingsystem.dto.response.RoomDetailResponseDTO;
+import ru.bookingsystem.dto.response.RoomListResponseDTO;
 import ru.bookingsystem.entity.Room;
 import ru.bookingsystem.service.RoomService;
 
@@ -17,12 +19,16 @@ public class RoomController {
     private final RoomService roomService;
 
     @GetMapping("/rooms")
-    public List<Room> getAllRooms() {
-        return roomService.getAllRooms();
+    public List<RoomListResponseDTO> getAllRooms(
+            @RequestParam(required = false) Room.Status status,
+            @RequestParam(defaultValue = "createdAt") String sortBy,
+            @RequestParam(defaultValue = "desc") String direction
+    ) {
+        return roomService.getAllRoomsSorted(status, sortBy, direction);
     }
 
     @GetMapping("/room/{id}")
-    public Room getRoomById(@PathVariable("id") Long id) {
+    public RoomDetailResponseDTO getRoomById(@PathVariable("id") Long id) {
         return roomService.getRoomById(id);
     }
 
