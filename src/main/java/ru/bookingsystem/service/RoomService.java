@@ -29,7 +29,7 @@ public class RoomService {
         Sort sort = Sort.by(dir, sortedBy);
 
         if (status == null) {
-            roomRepository.findAll(sort);
+            return roomRepository.findAll(sort);
         }
 
         return roomRepository.findAllByStatus(status, sort);
