@@ -5,6 +5,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.bookingsystem.dto.request.RoomRequestDTO;
+import ru.bookingsystem.dto.response.RoomDetailResponseDTO;
+import ru.bookingsystem.dto.response.RoomListResponseDTO;
 import ru.bookingsystem.entity.Equipment;
 import ru.bookingsystem.entity.Room;
 import ru.bookingsystem.exception.EntityNotFoundException;
@@ -24,21 +26,26 @@ public class RoomService {
     private final RoomMapper roomMapper;
 
     @Transactional(readOnly = true)
-    public List<Room> getAllRoomsSorted(Room.Status status, String sortedBy, String direction) {
+    public List<RoomListResponseDTO> getAllRoomsSorted(Room.Status status, String sortedBy, String direction) {
         Sort.Direction dir = (direction.equalsIgnoreCase("desc")) ? Sort.Direction.DESC : Sort.Direction.ASC;
         Sort sort = Sort.by(dir, sortedBy);
 
         if (status == null) {
-            return roomRepository.findAll(sort);
+            return roomRepository.findAll(sort).stream()
+                    .map(roomMapper::toRoomListResponseDTO)
+                    .toList();
         }
 
-        return roomRepository.findAllByStatus(status, sort);
+        return roomRepository.findAllByStatus(status, sort).stream()
+                .map(roomMapper::toRoomListResponseDTO)
+                .toList();
     }
 
     @Transactional(readOnly = true)
-    public Room getRoomById(Long id) {
-        return roomRepository.findById(id).orElseThrow(() ->
-                new EntityNotFoundException("Room with ID: " + id + " not found"));
+    public RoomDetailResponseDTO getRoomById(Long id) {
+        return roomMapper.toRoomDetailResponseDTO(roomRepository.findById(id)
+                .orElseThrow(() ->
+                new EntityNotFoundException("Room with ID: " + id + " not found")));
     }
 
     @Transactional

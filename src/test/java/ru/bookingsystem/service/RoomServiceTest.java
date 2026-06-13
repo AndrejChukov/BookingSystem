@@ -10,6 +10,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Sort;
 import ru.bookingsystem.dto.request.RoomRequestDTO;
+import ru.bookingsystem.dto.response.RoomDetailResponseDTO;
+import ru.bookingsystem.dto.response.RoomListResponseDTO;
 import ru.bookingsystem.entity.Equipment;
 import ru.bookingsystem.entity.Room;
 import ru.bookingsystem.exception.EntityNotFoundException;
@@ -59,28 +61,43 @@ class RoomServiceTest {
 
     @Test
     void getAllRooms() {
+        RoomListResponseDTO expectedRoom = new RoomListResponseDTO(
+                "Test", 10, Room.Status.AVAILABLE,
+                Instant.now(), Instant.now());
+
         List<Room> rooms = Collections.singletonList(room);
         when(roomRepository.findAllByStatus(any(Room.Status.class), any(Sort.class))).thenReturn(rooms);
+        when(roomMapper.toRoomListResponseDTO(any(Room.class))).thenReturn(expectedRoom);
 
-        List<Room> response = roomService.getAllRoomsSorted(Room.Status.AVAILABLE, "createdAt", "desc");
+        List<RoomListResponseDTO> response =
+                roomService.getAllRoomsSorted(Room.Status.AVAILABLE, "createdAt", "desc");
 
         assertNotNull(response);
         assertEquals(1, response.size());
-        assertEquals(room, response.get(0));
+        assertEquals(expectedRoom, response.get(0));
 
         verify(roomRepository).findAllByStatus(Room.Status.AVAILABLE,
                         Sort.by(Sort.Direction.DESC, "createdAt"));
+        verify(roomMapper).toRoomListResponseDTO(room);
     }
 
     @Test
     void getRoomById_Success() {
-        when(roomRepository.findById(anyLong())).thenReturn(Optional.of(room));
+        RoomDetailResponseDTO expectedRoom = new RoomDetailResponseDTO(
+                "Test", 27,  Room.Status.AVAILABLE,
+                null, Instant.now(), Instant.now()
+        );
 
-        Room response = roomService.getRoomById(ROOM_ID);
+        when(roomRepository.findById(anyLong())).thenReturn(Optional.of(room));
+        when(roomMapper.toRoomDetailResponseDTO(any(Room.class))).thenReturn(expectedRoom);
+
+        RoomDetailResponseDTO response = roomService.getRoomById(ROOM_ID);
 
         assertNotNull(response);
-        assertEquals(room, response);
+        assertEquals(expectedRoom, response);
+
         verify(roomRepository).findById(ROOM_ID);
+        verify(roomMapper).toRoomDetailResponseDTO(room);
     }
 
     @Test
