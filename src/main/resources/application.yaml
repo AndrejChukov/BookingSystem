@@ -1,3 +1,7 @@
 spring:
   application:
     name: bookingsystem
+  jpa:
+    properties:
+      hibernate:
+        default_batch_fetch_size: 20
