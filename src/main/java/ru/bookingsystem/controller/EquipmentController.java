@@ -4,7 +4,7 @@ import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import ru.bookingsystem.dto.request.EquipmentRequestDTO;
-import ru.bookingsystem.entity.Equipment;
+import ru.bookingsystem.dto.response.EquipmentResponseDTO;
 import ru.bookingsystem.service.EquipmentService;
 
 import java.util.List;
@@ -17,17 +17,17 @@ public class EquipmentController {
     private final EquipmentService equipmentService;
 
     @GetMapping("/equipments")
-    public List<Equipment> getAllEquipments() {
+    public List<EquipmentResponseDTO> getAllEquipments() {
         return equipmentService.getAllEquipments();
     }
 
     @GetMapping("/equipment/{id}")
-    public Equipment getEquipmentById(@PathVariable("id") Long id) {
+    public EquipmentResponseDTO getEquipmentById(@PathVariable("id") Long id) {
         return equipmentService.getEquipmentById(id);
     }
 
     @PostMapping("/equipment")
-    public Equipment createEquipment(@Valid @RequestBody EquipmentRequestDTO equipmentRequest) {
+    public EquipmentResponseDTO createEquipment(@Valid @RequestBody EquipmentRequestDTO equipmentRequest) {
         return equipmentService.createEquipment(equipmentRequest);
     }
 

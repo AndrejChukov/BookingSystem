@@ -33,7 +33,7 @@ public class RoomController {
     }
 
     @PostMapping("/room")
-    public Room createRoom(@Valid @RequestBody RoomRequestDTO roomRequest) {
+    public RoomDetailResponseDTO createRoom(@Valid @RequestBody RoomRequestDTO roomRequest) {
         return roomService.createRoom(roomRequest);
     }
 
