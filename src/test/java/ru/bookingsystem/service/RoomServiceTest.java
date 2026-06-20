@@ -21,7 +21,6 @@ import ru.bookingsystem.repository.RoomRepository;
 
 import java.time.Instant;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
@@ -45,18 +44,23 @@ class RoomServiceTest {
     private RoomRequestDTO roomRequest;
     private Equipment equipment;
     private List<Equipment> equipments;
+    private RoomDetailResponseDTO mockRoomDetailedResponse;
 
     @BeforeEach
     void setUp() {
+        equipment = new Equipment();
+        equipments = Collections.singletonList(equipment);
+
         room = new Room();
         room.setId(ROOM_ID);
         room.setName("Audience");
-        room.setCreatedAt(Instant.now());
-        room.setUpdatedAt(Instant.now());
+        room.setEquipmentList(equipments);
         roomRequest = new RoomRequestDTO(
-                "Audience", 20, List.of(1L, 2L), Room.Status.AVAILABLE);
-        equipment = new Equipment();
-        equipments = Collections.singletonList(equipment);
+                "Audience", 20, List.of(1L), Room.Status.AVAILABLE);
+        mockRoomDetailedResponse = new RoomDetailResponseDTO(
+                "Test", 27,  Room.Status.AVAILABLE,
+                null, Instant.now(), Instant.now()
+        );
     }
 
     @Test
@@ -83,18 +87,13 @@ class RoomServiceTest {
 
     @Test
     void getRoomById_Success() {
-        RoomDetailResponseDTO expectedRoom = new RoomDetailResponseDTO(
-                "Test", 27,  Room.Status.AVAILABLE,
-                null, Instant.now(), Instant.now()
-        );
-
         when(roomRepository.findById(anyLong())).thenReturn(Optional.of(room));
-        when(roomMapper.toRoomDetailResponseDTO(any(Room.class))).thenReturn(expectedRoom);
+        when(roomMapper.toRoomDetailResponseDTO(any(Room.class))).thenReturn(mockRoomDetailedResponse);
 
         RoomDetailResponseDTO response = roomService.getRoomById(ROOM_ID);
 
         assertNotNull(response);
-        assertEquals(expectedRoom, response);
+        assertEquals(mockRoomDetailedResponse, response);
 
         verify(roomRepository).findById(ROOM_ID);
         verify(roomMapper).toRoomDetailResponseDTO(room);
@@ -114,11 +113,12 @@ class RoomServiceTest {
         when(roomMapper.toEntity(roomRequest)).thenReturn(room);
         when(equipmentRepository.findAllById(anyList())).thenReturn(equipments);
         when(roomRepository.save(room)).thenReturn(room);
+        when(roomMapper.toRoomDetailResponseDTO(any(Room.class))).thenReturn(mockRoomDetailedResponse);
 
-        Room response = roomService.createRoom(roomRequest);
+        RoomDetailResponseDTO response = roomService.createRoom(roomRequest);
 
         assertNotNull(response);
-        assertEquals(room, response);
+        assertEquals(mockRoomDetailedResponse, response);
         assertEquals(equipments, room.getEquipmentList());
 
         verify(roomMapper).toEntity(any(RoomRequestDTO.class));
@@ -133,6 +133,7 @@ class RoomServiceTest {
 
         when(roomRepository.findById(ROOM_ID)).thenReturn(Optional.of(room));
         when(roomRepository.save(any(Room.class))).thenReturn(room);
+        when(equipmentRepository.findAllById(anyList())).thenReturn(equipments);
 
         roomService.updateRoom(updatedRoom, ROOM_ID);
 

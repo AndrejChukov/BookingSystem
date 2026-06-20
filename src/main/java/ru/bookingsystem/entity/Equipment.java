@@ -1,6 +1,7 @@
 package ru.bookingsystem.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 import java.time.Instant;
@@ -8,12 +9,9 @@ import java.time.Instant;
 @Data
 @Entity
 @Table(name = "equipments")
-public class Equipment {
+public class Equipment extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
-
-    private Instant createdAt = Instant.now();
-    private Instant updatedAt = Instant.now();
 }

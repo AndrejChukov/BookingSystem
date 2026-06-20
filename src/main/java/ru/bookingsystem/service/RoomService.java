@@ -49,10 +49,10 @@ public class RoomService {
     }
 
     @Transactional
-    public Room createRoom(RoomRequestDTO roomRequest) {
+    public RoomDetailResponseDTO createRoom(RoomRequestDTO roomRequest) {
         Room newRoom = roomMapper.toEntity(roomRequest);
         assignEquipment(roomRequest, newRoom);
-        return roomRepository.save(newRoom);
+        return roomMapper.toRoomDetailResponseDTO(roomRepository.save(newRoom));
     }
 
     @Transactional
@@ -61,7 +61,6 @@ public class RoomService {
                 new EntityNotFoundException("Room with ID: " + id + " not found"));
 
         roomMapper.updateEntityFromDto(roomRequest, existingRoom);
-        existingRoom.setUpdatedAt(Instant.now());
 
         assignEquipment(roomRequest, existingRoom);
 
@@ -80,6 +79,7 @@ public class RoomService {
     private void assignEquipment(RoomRequestDTO roomRequest, Room newRoom) {
         if (roomRequest.equipmentIds() != null && !roomRequest.equipmentIds().isEmpty()) {
             List<Equipment> equipmentList = equipmentRepository.findAllById(roomRequest.equipmentIds());
+            if (equipmentList.size() != roomRequest.equipmentIds().size()) throw new EntityNotFoundException("One or more equipment not found");
             newRoom.setEquipmentList(equipmentList);
         }
     }

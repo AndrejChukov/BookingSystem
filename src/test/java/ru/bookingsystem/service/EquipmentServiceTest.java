@@ -9,6 +9,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import ru.bookingsystem.dto.request.EquipmentRequestDTO;
+import ru.bookingsystem.dto.response.EquipmentResponseDTO;
 import ru.bookingsystem.entity.Equipment;
 import ru.bookingsystem.exception.EntityNotFoundException;
 import ru.bookingsystem.mapper.EquipmentMapper;
@@ -33,24 +34,27 @@ class EquipmentServiceTest {
 
     private final Long EQUIPMENT_ID = 1L;
     private EquipmentRequestDTO mockEquipmentRequest;
+    private EquipmentResponseDTO mockEquipmentResponse;
     private Equipment equipment;
 
     @BeforeEach
     void setUp() {
         mockEquipmentRequest = new EquipmentRequestDTO("Whiteboard");
+        mockEquipmentResponse = new EquipmentResponseDTO(EQUIPMENT_ID, "Whiteboard");
         equipment = new Equipment();
         equipment.setId(EQUIPMENT_ID);
         equipment.setName("Whiteboard");
-        equipment.setCreatedAt(Instant.now());
-        equipment.setUpdatedAt(Instant.now());
+
+
     }
 
     @Test
     void getAllEquipments() {
         List<Equipment> mockList = Collections.singletonList(equipment);
         when(equipmentRepository.findAll()).thenReturn(mockList);
+        when(equipmentMapper.equipmentToResponse(any(Equipment.class))).thenReturn(mockEquipmentResponse);
 
-        List<Equipment> response = equipmentService.getAllEquipments();
+        List<EquipmentResponseDTO> response = equipmentService.getAllEquipments();
 
         assertNotNull(response);
         assertEquals(1, response.size());
@@ -61,11 +65,12 @@ class EquipmentServiceTest {
     @Test
     void getEquipmentById_Success() {
         when(equipmentRepository.findById(anyLong())).thenReturn(Optional.of(equipment));
+        when(equipmentMapper.equipmentToResponse(any(Equipment.class))).thenReturn(mockEquipmentResponse);
 
-        Equipment response = equipmentService.getEquipmentById(EQUIPMENT_ID);
+        EquipmentResponseDTO response = equipmentService.getEquipmentById(EQUIPMENT_ID);
 
         assertNotNull(response);
-        assertEquals(EQUIPMENT_ID, response.getId());
+        assertEquals(EQUIPMENT_ID, response.id());
 
         verify(equipmentRepository).findById(anyLong());
     }
@@ -83,11 +88,12 @@ class EquipmentServiceTest {
     void createEquipment() {
         when(equipmentMapper.toEntity(mockEquipmentRequest)).thenReturn(equipment);
         when(equipmentRepository.save(equipment)).thenReturn(equipment);
+        when(equipmentMapper.equipmentToResponse(equipment)).thenReturn(mockEquipmentResponse);
 
-        Equipment response = equipmentService.createEquipment(mockEquipmentRequest);
+        EquipmentResponseDTO response = equipmentService.createEquipment(mockEquipmentRequest);
 
         assertNotNull(response);
-        assertEquals(EQUIPMENT_ID, response.getId());
+        assertEquals(EQUIPMENT_ID, response.id());
 
         verify(equipmentMapper).toEntity(mockEquipmentRequest);
         verify(equipmentRepository).save(equipment);

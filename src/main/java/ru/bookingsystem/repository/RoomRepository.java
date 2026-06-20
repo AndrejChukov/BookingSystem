@@ -1,6 +1,5 @@
 package ru.bookingsystem.repository;
 
-import org.springframework.boot.autoconfigure.data.web.SpringDataWebProperties;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -13,4 +12,8 @@ import java.util.List;
 public interface RoomRepository extends JpaRepository<Room, Long> {
     @EntityGraph(attributePaths = {"equipmentList"})
     List<Room> findAllByStatus(Room.Status status, Sort sort);
+
+    @Override
+    @EntityGraph(attributePaths = {"equipmentList"})
+    List<Room> findAll(Sort sort);
 }
