@@ -72,16 +72,16 @@ class EquipmentServiceTest {
         assertNotNull(response);
         assertEquals(EQUIPMENT_ID, response.id());
 
-        verify(equipmentRepository).findById(anyLong());
+        verify(equipmentRepository).findById(EQUIPMENT_ID);
     }
 
     @Test
     void getEquipmentById_ShouldThrow_EntityNotFoundException() {
         when(equipmentRepository.findById(anyLong())).thenReturn(Optional.empty());
 
-        assertThrows(EntityNotFoundException.class, () -> equipmentService.getEquipmentById(anyLong()));
+        assertThrows(EntityNotFoundException.class, () -> equipmentService.getEquipmentById(EQUIPMENT_ID));
 
-        verify(equipmentRepository, times(1)).findById(anyLong());
+        verify(equipmentRepository, times(1)).findById(EQUIPMENT_ID);
     }
 
     @Test
@@ -103,8 +103,8 @@ class EquipmentServiceTest {
     void updateEquipment_Success() {
         EquipmentRequestDTO updateEquipmentRequest = new EquipmentRequestDTO("Projector");
 
-        when(equipmentRepository.findById(EQUIPMENT_ID)).thenReturn(Optional.of(equipment));
-        when(equipmentRepository.save(equipment)).thenReturn(equipment);
+        when(equipmentRepository.findById(anyLong())).thenReturn(Optional.of(equipment));
+        when(equipmentRepository.save(any(Equipment.class))).thenReturn(equipment);
 
         equipmentService.updateEquipment(updateEquipmentRequest, EQUIPMENT_ID);
 
@@ -115,12 +115,12 @@ class EquipmentServiceTest {
         assertEquals(EQUIPMENT_ID, captoredEquipment.getId());
 
         verify(equipmentMapper).updateEntityFromDto(updateEquipmentRequest, equipment);
-        verify(equipmentRepository).findById(anyLong());
+        verify(equipmentRepository).findById(EQUIPMENT_ID);
     }
 
     @Test
     void updateEquipment_ShouldThrow_EntityNotFoundException() {
-        when(equipmentRepository.findById(EQUIPMENT_ID)).thenReturn(Optional.empty());
+        when(equipmentRepository.findById(anyLong())).thenReturn(Optional.empty());
 
         assertThrows(EntityNotFoundException.class,
                 () -> equipmentService.updateEquipment(mockEquipmentRequest, EQUIPMENT_ID));
@@ -133,8 +133,8 @@ class EquipmentServiceTest {
         when(equipmentRepository.existsById(anyLong())).thenReturn(true);
         equipmentService.deleteEquipment(EQUIPMENT_ID);
 
-        verify(equipmentRepository).existsById(anyLong());
-        verify(equipmentRepository).deleteById(anyLong());
+        verify(equipmentRepository).existsById(EQUIPMENT_ID);
+        verify(equipmentRepository).deleteById(EQUIPMENT_ID);
     }
 
     @Test
@@ -142,7 +142,7 @@ class EquipmentServiceTest {
         when(equipmentRepository.existsById(anyLong())).thenReturn(false);
         assertThrows(EntityNotFoundException.class, () -> equipmentService.deleteEquipment(EQUIPMENT_ID));
 
-        verify(equipmentRepository).existsById(anyLong());
-        verify(equipmentRepository, never()).deleteById(anyLong());
+        verify(equipmentRepository).existsById(EQUIPMENT_ID);
+        verify(equipmentRepository, never()).deleteById(EQUIPMENT_ID);
     }
 }
