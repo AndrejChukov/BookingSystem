@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.bookingsystem.dto.request.EquipmentRequestDTO;
+import ru.bookingsystem.dto.response.EquipmentResponseDTO;
 import ru.bookingsystem.entity.Equipment;
 import ru.bookingsystem.exception.EntityNotFoundException;
 import ru.bookingsystem.mapper.EquipmentMapper;
@@ -11,6 +12,7 @@ import ru.bookingsystem.repository.EquipmentRepository;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -20,20 +22,22 @@ public class EquipmentService {
     private final EquipmentMapper equipmentMapper;
 
     @Transactional(readOnly = true)
-    public List<Equipment> getAllEquipments() {
-        return equipmentRepository.findAll();
+    public List<EquipmentResponseDTO> getAllEquipments() {
+        return equipmentRepository.findAll().stream()
+                .map(equipmentMapper::equipmentToResponse)
+                .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
-    public Equipment getEquipmentById(Long id) {
-        return equipmentRepository.findById(id).orElseThrow(() ->
-                new EntityNotFoundException("Equipment with ID: " + id + " not found"));
+    public EquipmentResponseDTO getEquipmentById(Long id) {
+        return equipmentMapper.equipmentToResponse(equipmentRepository.findById(id).orElseThrow(() ->
+                new EntityNotFoundException("Equipment with ID: " + id + " not found")));
     }
 
     @Transactional
-    public Equipment createEquipment(EquipmentRequestDTO equipmentRequest) {
+    public EquipmentResponseDTO createEquipment(EquipmentRequestDTO equipmentRequest) {
         Equipment newEquipment = equipmentMapper.toEntity(equipmentRequest);
-        return equipmentRepository.save(newEquipment);
+        return equipmentMapper.equipmentToResponse(equipmentRepository.save(newEquipment));
     }
 
     @Transactional
@@ -42,7 +46,6 @@ public class EquipmentService {
                 new EntityNotFoundException("Equipment with ID: " + id + " not found"));
 
         equipmentMapper.updateEntityFromDto(equipmentRequest, existingEquipment);
-        existingEquipment.setUpdatedAt(Instant.now());
 
         equipmentRepository.save(existingEquipment);
     }
