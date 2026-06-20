@@ -110,20 +110,24 @@ class RoomServiceTest {
 
     @Test
     void createRoom() {
-        when(roomMapper.toEntity(roomRequest)).thenReturn(room);
+        when(roomMapper.toEntity(any(RoomRequestDTO.class))).thenReturn(room);
         when(equipmentRepository.findAllById(anyList())).thenReturn(equipments);
-        when(roomRepository.save(room)).thenReturn(room);
+        when(roomRepository.save(any(Room.class))).thenReturn(room);
         when(roomMapper.toRoomDetailResponseDTO(any(Room.class))).thenReturn(mockRoomDetailedResponse);
 
         RoomDetailResponseDTO response = roomService.createRoom(roomRequest);
 
         assertNotNull(response);
         assertEquals(mockRoomDetailedResponse, response);
-        assertEquals(equipments, room.getEquipmentList());
 
-        verify(roomMapper).toEntity(any(RoomRequestDTO.class));
+        verify(roomRepository).save(roomCaptor.capture());
+        Room capturedRoom = roomCaptor.getValue();
+
+        assertEquals(room.getName(), capturedRoom.getName());
+        assertEquals(equipments, capturedRoom.getEquipmentList());
+
+        verify(roomMapper).toEntity(roomRequest);
         verify(equipmentRepository).findAllById(anyList());
-        verify(roomRepository).save(any(Room.class));
     }
 
     @Test
@@ -131,7 +135,7 @@ class RoomServiceTest {
         RoomRequestDTO updatedRoom =
                 new RoomRequestDTO("updated name", 100, List.of(1L), Room.Status.AVAILABLE);
 
-        when(roomRepository.findById(ROOM_ID)).thenReturn(Optional.of(room));
+        when(roomRepository.findById(anyLong())).thenReturn(Optional.of(room));
         when(roomRepository.save(any(Room.class))).thenReturn(room);
         when(equipmentRepository.findAllById(anyList())).thenReturn(equipments);
 
@@ -144,18 +148,18 @@ class RoomServiceTest {
         assertEquals(ROOM_ID, capturedRoom.getId());
 
         verify(roomMapper).updateEntityFromDto(updatedRoom, room);
-        verify(roomRepository).findById(anyLong());
-        verify(roomRepository).save(any(Room.class));
+        verify(roomRepository).findById(ROOM_ID);
+        verify(roomRepository).save(room);
     }
 
     @Test
     void updateRoom_ShouldThrow_EntityNotFoundException() {
-        when(roomRepository.findById(ROOM_ID)).thenReturn(Optional.empty());
+        when(roomRepository.findById(anyLong())).thenReturn(Optional.empty());
 
         assertThrows(EntityNotFoundException.class, () -> roomService.updateRoom(roomRequest, ROOM_ID));
 
         verify(roomRepository, never()).save(any(Room.class));
-        verify(roomRepository).findById(anyLong());
+        verify(roomRepository).findById(ROOM_ID);
     }
 
     @Test
@@ -163,8 +167,8 @@ class RoomServiceTest {
         when(roomRepository.existsById(anyLong())).thenReturn(true);
         roomService.deleteRoom(ROOM_ID);
 
-        verify(roomRepository).existsById(anyLong());
-        verify(roomRepository).deleteById(anyLong());
+        verify(roomRepository).existsById(ROOM_ID);
+        verify(roomRepository).deleteById(ROOM_ID);
     }
 
     @Test
@@ -172,7 +176,7 @@ class RoomServiceTest {
         when(roomRepository.existsById(anyLong())).thenReturn(false);
         assertThrows(EntityNotFoundException.class, () -> roomService.deleteRoom(ROOM_ID));
 
-        verify(roomRepository).existsById(anyLong());
+        verify(roomRepository).existsById(ROOM_ID);
         verify(roomRepository, never()).deleteById(anyLong());
     }
 }
