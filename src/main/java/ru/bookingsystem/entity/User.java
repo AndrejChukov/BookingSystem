@@ -34,7 +34,7 @@ public class User extends BaseEntity implements UserDetails {
         return username;
     }
 
-    enum Role {
+    public enum Role {
         USER, WORKER, ADMIN;
         public String getFullNameRole() {
             return "ROLE_" + this.name();
