@@ -1,7 +1,7 @@
 package ru.bookingsystem.dto.response;
 
 
-public record UserResponseDTO(String username, String email) {
+public record UserResponseDTO(String jwtToken, String username, String email) {
 }
 
 
