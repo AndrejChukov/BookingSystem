@@ -5,7 +5,8 @@ spring:
     properties:
       hibernate:
         default_batch_fetch_size: 20
-  jwt:
-    secret-key: 404E635266556A586E3274234872394827342B6250645367566B5970
-    expiration-time: 86400000 # 24 hours in milliseconds
-    algorithm: HS256
+  security:
+    jwt:
+      secret-key: 404E635266556A586E3274234872394827342B6250645367566B5970
+      expiration-time: 86400000 # 24 hours in milliseconds
+      algorithm: HS256
