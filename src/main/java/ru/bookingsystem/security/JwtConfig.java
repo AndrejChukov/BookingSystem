@@ -5,6 +5,7 @@ import com.nimbusds.jose.jwk.OctetSequenceKey;
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
+import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,6 +21,7 @@ public class JwtConfig {
     @Value("${spring.security.jwt.secret-key}")
     private String secretKey;
 
+    @Getter
     @Value("${spring.security.jwt.expiration-time}")
     private long expirationTime;
 
