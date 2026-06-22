@@ -2,13 +2,14 @@ package ru.bookingsystem.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import ru.bookingsystem.dto.request.UserRequestDTO;
+import ru.bookingsystem.dto.response.LoginRequestDTO;
 import ru.bookingsystem.dto.response.UserResponseDTO;
+import ru.bookingsystem.entity.User;
 import ru.bookingsystem.service.UserService;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api")
@@ -23,8 +24,13 @@ public class UserController {
     }
 
     @PostMapping("/auth/signin")
-    public UserResponseDTO authenticate(@Valid @RequestBody UserRequestDTO userRequest) {
+    public UserResponseDTO authenticate(@Valid @RequestBody LoginRequestDTO userRequest) {
         return userService.authenticate(userRequest);
+    }
+
+    @GetMapping("/user")
+    public Map<String, Object> getUser() {
+        return userService.getUser();
     }
 
 }

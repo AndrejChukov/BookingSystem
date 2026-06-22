@@ -1,4 +1,4 @@
 package ru.bookingsystem.dto.response;
 
-public record LoginRequestDTO() {
+public record LoginRequestDTO(String username, String password) {
 }
