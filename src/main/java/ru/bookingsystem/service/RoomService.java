@@ -1,6 +1,7 @@
 package ru.bookingsystem.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,11 +15,11 @@ import ru.bookingsystem.mapper.RoomMapper;
 import ru.bookingsystem.repository.EquipmentRepository;
 import ru.bookingsystem.repository.RoomRepository;
 
-import java.time.Instant;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class RoomService {
 
     private final RoomRepository roomRepository;
@@ -27,6 +28,7 @@ public class RoomService {
 
     @Transactional(readOnly = true)
     public List<RoomListResponseDTO> getAllRoomsSorted(Room.Status status, String sortedBy, String direction) {
+        log.debug("Fetching all rooms sorted status={} sortBy={} direction={}", status, sortedBy, direction);
         Sort.Direction dir = (direction.equalsIgnoreCase("desc")) ? Sort.Direction.DESC : Sort.Direction.ASC;
         Sort sort = Sort.by(dir, sortedBy);
 
@@ -43,6 +45,7 @@ public class RoomService {
 
     @Transactional(readOnly = true)
     public RoomDetailResponseDTO getRoomById(Long id) {
+        log.debug("Fetching room by id={}", id);
         return roomMapper.toRoomDetailResponseDTO(roomRepository.findById(id)
                 .orElseThrow(() ->
                 new EntityNotFoundException("Room with ID: " + id + " not found")));
@@ -50,13 +53,17 @@ public class RoomService {
 
     @Transactional
     public RoomDetailResponseDTO createRoom(RoomRequestDTO roomRequest) {
+        log.info("Creating room: {}", roomRequest);
         Room newRoom = roomMapper.toEntity(roomRequest);
         assignEquipment(roomRequest, newRoom);
-        return roomMapper.toRoomDetailResponseDTO(roomRepository.save(newRoom));
+        Room saved = roomRepository.save(newRoom);
+        log.debug("Created room id={}", saved.getId());
+        return roomMapper.toRoomDetailResponseDTO(saved);
     }
 
     @Transactional
     public void updateRoom(RoomRequestDTO roomRequest, Long id) {
+        log.info("Updating room id={} with {}", id, roomRequest);
         Room existingRoom = roomRepository.findById(id).orElseThrow(() ->
                 new EntityNotFoundException("Room with ID: " + id + " not found"));
 
@@ -69,6 +76,7 @@ public class RoomService {
 
     @Transactional
     public void deleteRoom(Long id) {
+        log.info("Deleting room id={}", id);
         if (roomRepository.existsById(id)) {
             roomRepository.deleteById(id);
         } else {
@@ -79,7 +87,11 @@ public class RoomService {
     private void assignEquipment(RoomRequestDTO roomRequest, Room newRoom) {
         if (roomRequest.equipmentIds() != null && !roomRequest.equipmentIds().isEmpty()) {
             List<Equipment> equipmentList = equipmentRepository.findAllById(roomRequest.equipmentIds());
-            if (equipmentList.size() != roomRequest.equipmentIds().size()) throw new EntityNotFoundException("One or more equipment not found");
+            if (equipmentList.size() != roomRequest.equipmentIds().size()) {
+                log.warn("Equipment assignment failed: requested {} items but found {}",
+                        roomRequest.equipmentIds().size(), equipmentList.size());
+                throw new EntityNotFoundException("One or more equipment not found");
+            }
             newRoom.setEquipmentList(equipmentList);
         }
     }
