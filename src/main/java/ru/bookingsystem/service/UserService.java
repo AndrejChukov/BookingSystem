@@ -1,6 +1,7 @@
 package ru.bookingsystem.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -20,6 +21,7 @@ import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class UserService {
 
     private final UserRepository userRepository;
@@ -30,6 +32,7 @@ public class UserService {
     private final TokenService tokenService;
 
     public UserResponseDTO register(UserRequestDTO userRequest) {
+        log.info("Registering new user username={}", userRequest.username());
         User newUser = userMapper.toEntity(userRequest);
 
         newUser.setPassword(passwordEncoder.encode(userRequest.password()));
@@ -43,10 +46,12 @@ public class UserService {
                 newUser.getAuthorities()
         ));
 
+        log.debug("User registered username={} id={}", newUser.getUsername(), newUser.getId());
         return new UserResponseDTO(jwtToken, newUser.getUsername(), newUser.getEmail());
     }
 
     public UserResponseDTO authenticate(LoginRequestDTO userRequest) {
+        log.info("Authenticating user username={}", userRequest.username());
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         userRequest.username(), userRequest.password()
@@ -55,13 +60,14 @@ public class UserService {
         User authUser = (User) authentication.getPrincipal();
 
         String jwtToken = tokenService.generateToken(authentication);
+        log.debug("User authenticated username={}", authUser.getUsername());
         return new UserResponseDTO(jwtToken, authUser.getUsername(), authUser.getEmail());
     }
 
     public Map<String, Object> getUser() {
+        log.debug("Fetching current authenticated user claims");
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Jwt jwt = (Jwt) auth.getPrincipal();
-        Map<String, Object> map = jwt.getClaims();
-        return map;
+        return jwt.getClaims();
     }
 }
