@@ -23,6 +23,17 @@ import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Service that implements booking-related business logic.
+ *
+ * <p>This service is responsible for:
+ * - returning bookings for the currently authenticated user
+ * - creating new bookings (with validation and conflict checks)
+ * - deleting bookings
+ *
+ * <p>It depends on JPA repositories and a MapStruct mapper to convert between
+ * entities and DTOs.
+ */
 @Service
 @RequiredArgsConstructor
 public class BookingService {
@@ -32,6 +43,16 @@ public class BookingService {
     private final UserRepository userRepository;
     private final BookingMapper bookingMapper;
 
+    /**
+     * Returns list of bookings that belong to the currently authenticated user.
+     *
+     * <p>The currently authenticated user is resolved from the security context
+     * (see {@link #getCurrentUser()}). The result is mapped to {@link BookingResponseDTO}
+     * using the configured {@code BookingMapper}.
+     *
+     * @return list of booking response DTOs for the current user (may be empty)
+     * @throws EntityNotFoundException when the current user cannot be resolved
+     */
     @Transactional(readOnly = true)
     public List<BookingResponseDTO> getMyBooking() {
         return bookingRepository.findAllByUserId(getCurrentUser().getId()).stream()
@@ -66,6 +87,14 @@ public class BookingService {
         return bookingMapper.toResponse(bookingRepository.save(booking));
     }
 
+    /**
+     * Deletes a booking by id.
+     *
+     * <p>This delegates to the repository deleteById method. If the id does not exist,
+     * JPA will not throw an exception;
+     *
+     * @param id booking id to delete
+     */
     @Transactional
     public void deleteBooking(Long id) {
         bookingRepository.deleteById(id);
