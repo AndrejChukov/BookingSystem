@@ -1,6 +1,8 @@
 package ru.bookingsystem.repository;
 
+import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import ru.bookingsystem.entity.Booking;
@@ -24,5 +26,12 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     AND (b.startTime < :endTime AND b.endTime > :startTime)
     """)
     boolean existsOverlappingBookings(Long roomId, Instant startTime, Instant endTime);
+
+    @Modifying
+    @Query("""
+    UPDATE Booking b Set b.bookingStatus = 'COMPLETED'
+    WHERE b.endTime < :now AND b.bookingStatus = 'CONFIRMED'
+    """)
+    int updateCompletedBookings(Instant now);
 
 }
