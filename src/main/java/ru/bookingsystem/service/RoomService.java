@@ -84,7 +84,7 @@ public class RoomService {
         }
     }
 
-    private void assignEquipment(RoomRequestDTO roomRequest, Room newRoom) {
+    private void assignEquipment(RoomRequestDTO roomRequest, Room room) {
         if (roomRequest.equipmentIds() != null && !roomRequest.equipmentIds().isEmpty()) {
             List<Equipment> equipmentList = equipmentRepository.findAllById(roomRequest.equipmentIds());
             if (equipmentList.size() != roomRequest.equipmentIds().size()) {
@@ -92,7 +92,7 @@ public class RoomService {
                         roomRequest.equipmentIds().size(), equipmentList.size());
                 throw new EntityNotFoundException("One or more equipment not found");
             }
-            newRoom.setEquipmentList(equipmentList);
+            room.setEquipmentList(equipmentList);
         }
     }
 

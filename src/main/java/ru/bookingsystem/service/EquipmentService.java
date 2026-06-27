@@ -37,7 +37,6 @@ public class EquipmentService {
                 new EntityNotFoundException("Equipment with ID: " + id + " not found")));
     }
 
-    @Transactional
     public EquipmentResponseDTO createEquipment(EquipmentRequestDTO equipmentRequest) {
         log.info("Creating equipment {}", equipmentRequest);
         Equipment newEquipment = equipmentMapper.toEntity(equipmentRequest);

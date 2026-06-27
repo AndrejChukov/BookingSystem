@@ -18,6 +18,19 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
 
+
+/**
+ * Service that implements security features
+ *
+ * <p> This service is responsible for:
+ *  - create security filter chain
+ *  - create password encoder bean
+ *  - create authentication provider bean
+ *  - create authentication manager bean to manage authentication providers
+ *  - create authentication converter bean to manage claims and authority prefix
+ *
+ */
+
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
@@ -32,7 +45,13 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**", "/h2-console/**", "api/rooms/available").permitAll()
+                        .requestMatchers(
+                                "/api/auth/**",
+                                "/h2-console/**",
+                                "/v3/api-docs",
+                                "/v3/api-docs/**",
+                                "/swagger-ui/**",
+                                "/api/rooms/available").permitAll()
                         .anyRequest().authenticated())
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

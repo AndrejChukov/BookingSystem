@@ -16,6 +16,15 @@ import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 
 import javax.crypto.SecretKey;
 
+/**
+ * Configuration class for JWT (JSON Web Token) settings.
+ *
+ * <p>This class is responsible for:
+ * - Reading JWT configuration properties from the application properties file.
+ * - Creating beans for JwtDecoder and JwtEncoder to handle JWT encoding and decoding.
+ * - Providing methods to retrieve the secret key and JWS algorithm used for signing tokens.
+ */
+
 @Configuration
 public class JwtConfig {
     @Value("${spring.security.jwt.secret-key}")
