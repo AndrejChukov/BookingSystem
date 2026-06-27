@@ -1,0 +1,31 @@
+spring:
+  application:
+    name: bookingsystem
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        default_batch_fetch_size: 20
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+  datasource:
+    generate-unique-name: false
+    url: jdbc:postgresql://localhost:5432/bookingdb
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+  security:
+    jwt:
+      secret-key: 404E635266556A586E3274234872394827342B6250645367566B5970
+      expiration-time: 86400000 # 24 hours in milliseconds
+      algorithm: HS256
+  data:
+    redis:
+      host: localhost
+      port: 6379
+logging:
+  structured:
+    format:
+      console: ecs
+  level:
+    ru.bookingsystem: INFO
