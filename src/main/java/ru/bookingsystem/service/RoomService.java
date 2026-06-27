@@ -2,6 +2,8 @@ package ru.bookingsystem.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,6 +29,7 @@ public class RoomService {
     private final RoomMapper roomMapper;
 
     @Transactional(readOnly = true)
+    @Cacheable(value = "rooms", key = "{#status, #sortedBy, #direction}")
     public List<RoomListResponseDTO> getAllRoomsSorted(Room.Status status, String sortedBy, String direction) {
         log.debug("Fetching all rooms sorted status={} sortBy={} direction={}", status, sortedBy, direction);
         Sort.Direction dir = (direction.equalsIgnoreCase("desc")) ? Sort.Direction.DESC : Sort.Direction.ASC;
@@ -44,6 +47,7 @@ public class RoomService {
     }
 
     @Transactional(readOnly = true)
+    @Cacheable(value = "rooms", key = "#id")
     public RoomDetailResponseDTO getRoomById(Long id) {
         log.debug("Fetching room by id={}", id);
         return roomMapper.toRoomDetailResponseDTO(roomRepository.findById(id)
@@ -52,6 +56,7 @@ public class RoomService {
     }
 
     @Transactional
+    @CacheEvict(value = "rooms", allEntries = true)
     public RoomDetailResponseDTO createRoom(RoomRequestDTO roomRequest) {
         log.info("Creating room: {}", roomRequest);
         Room newRoom = roomMapper.toEntity(roomRequest);
@@ -62,6 +67,7 @@ public class RoomService {
     }
 
     @Transactional
+    @CacheEvict(value = "rooms", allEntries = true)
     public void updateRoom(RoomRequestDTO roomRequest, Long id) {
         log.info("Updating room id={} with {}", id, roomRequest);
         Room existingRoom = roomRepository.findById(id).orElseThrow(() ->
@@ -75,6 +81,7 @@ public class RoomService {
     }
 
     @Transactional
+    @CacheEvict(value = "rooms", allEntries = true)
     public void deleteRoom(Long id) {
         log.info("Deleting room id={}", id);
         if (roomRepository.existsById(id)) {

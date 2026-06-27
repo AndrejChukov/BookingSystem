@@ -19,3 +19,11 @@ spring:
       secret-key: 404E635266556A586E3274234872394827342B6250645367566B5970
       expiration-time: 86400000 # 24 hours in milliseconds
       algorithm: HS256
+  data:
+    redis:
+      host: localhost
+      port: 6379
+logging:
+  level:
+    ru.bookingsystem: DEBUG
+    org.springframework.cache: TRACE
