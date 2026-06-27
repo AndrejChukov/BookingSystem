@@ -18,6 +18,19 @@ services:
         - "6379:6379"
       volumes:
         - redis_data:/data
+
+    bookingsystem-app:
+      build: .
+      container_name: bookingsystem-app
+      ports:
+        - "8080:8080"
+      depends_on:
+        - postgres-db
+        - redis-cache
+      environment:
+        SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-db:5432/bookingdb
+        SPRING_DATA_REDIS_HOST: redis-cache
+
 volumes:
   postgres_data:
   redis_data:
