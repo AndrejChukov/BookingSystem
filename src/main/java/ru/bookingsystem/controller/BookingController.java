@@ -21,7 +21,6 @@ import java.util.List;
  * - POST /api/bookings       : creates a new booking for the current user
  * - DELETE /api/bookings/{id}: deletes a booking by id
  *
- * <p>OpenAPI annotations are added so springdoc-openapi can generate Swagger UI documentation.
  */
 @RestController
 @RequestMapping("/api")
