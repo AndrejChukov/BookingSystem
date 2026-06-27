@@ -2,6 +2,8 @@ package ru.bookingsystem.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.bookingsystem.dto.request.EquipmentRequestDTO;
@@ -23,6 +25,7 @@ public class EquipmentService {
     private final EquipmentMapper equipmentMapper;
 
     @Transactional(readOnly = true)
+    @Cacheable(value = "equipment")
     public List<EquipmentResponseDTO> getAllEquipments() {
         log.debug("Fetching all equipments");
         return equipmentRepository.findAll().stream()
@@ -31,12 +34,15 @@ public class EquipmentService {
     }
 
     @Transactional(readOnly = true)
+    @Cacheable(value = "equipment", key = "#id")
     public EquipmentResponseDTO getEquipmentById(Long id) {
         log.debug("Fetching equipment by id={}", id);
         return equipmentMapper.equipmentToResponse(equipmentRepository.findById(id).orElseThrow(() ->
                 new EntityNotFoundException("Equipment with ID: " + id + " not found")));
     }
 
+    @Transactional
+    @CacheEvict(value = "equipment", allEntries = true)
     public EquipmentResponseDTO createEquipment(EquipmentRequestDTO equipmentRequest) {
         log.info("Creating equipment {}", equipmentRequest);
         Equipment newEquipment = equipmentMapper.toEntity(equipmentRequest);
@@ -46,6 +52,7 @@ public class EquipmentService {
     }
 
     @Transactional
+    @CacheEvict(value = "equipment", allEntries = true)
     public void updateEquipment(EquipmentRequestDTO equipmentRequest, Long id) {
         log.info("Updating equipment id={} with {}", id, equipmentRequest);
         Equipment existingEquipment = equipmentRepository.findById(id).orElseThrow(() ->
@@ -57,6 +64,7 @@ public class EquipmentService {
     }
 
     @Transactional
+    @CacheEvict(value = "equipment", allEntries = true)
     public void deleteEquipment(Long id) {
         log.info("Deleting equipment id={}", id);
         if (equipmentRepository.existsById(id)) {
