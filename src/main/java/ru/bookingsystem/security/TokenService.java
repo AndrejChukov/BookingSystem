@@ -15,6 +15,15 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 
+/**
+ * Service that implements generation jwt token
+ *
+ * <p> This Service is responsible for:
+ *  - create header
+ *  - create claims
+ *  - get jwt token
+ */
+
 @Service
 @RequiredArgsConstructor
 public class TokenService {

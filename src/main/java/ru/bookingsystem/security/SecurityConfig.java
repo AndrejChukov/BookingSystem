@@ -18,6 +18,19 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
 
+
+/**
+ * Service that implements security features
+ *
+ * <p> This service is responsible for:
+ *  - create security filter chain
+ *  - create password encoder bean
+ *  - create authentication provider bean
+ *  - create authentication manager bean to manage authentication providers
+ *  - create authentication converter bean to manage claims and authority prefix
+ *
+ */
+
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
