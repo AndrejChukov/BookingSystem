@@ -19,6 +19,9 @@ import ru.bookingsystem.repository.RoomRepository;
 import ru.bookingsystem.repository.UserRepository;
 
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -59,10 +62,45 @@ public class BookingService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Create new Booking.
+     *
+     * <p>This method validates the booking request based on time (8:00-21:00 UTC+3)
+     * and date (must be same day) constraints.
+     *
+     * @param request the booking request DTO
+     * @return the created booking response DTO
+     * @throws BadRequestParametersException if date or time aren't valid,
+     * or if the room is already booked for the given time range
+     */
+
     @Transactional
     public BookingResponseDTO createBooking(BookingRequestDTO request) {
         Instant startTime = request.startTime();
         Instant endTime = request.endTime();
+
+        LocalTime startOffice = LocalTime.of(8, 0);
+        LocalTime endOffice = LocalTime.of(21, 0);
+        ZoneId localZone = ZoneId.systemDefault();
+
+        LocalTime bookingStartLocal = startTime.atZone(localZone).toLocalTime();
+        LocalTime bookingEndLocal = endTime.atZone(localZone).toLocalTime();
+
+        LocalDate bookingStartDate = startTime.atZone(localZone).toLocalDate();
+        LocalDate bookingEndDate = endTime.atZone(localZone).toLocalDate();
+
+        if (!bookingStartDate.equals(bookingEndDate)) {
+            throw new BadRequestParametersException("Booking must start and end on the same day");
+        }
+
+        if (bookingStartLocal.isBefore(startOffice) || bookingStartLocal.isAfter(endOffice)) {
+            throw new BadRequestParametersException("Booking start time must be within working hours (08:00 - 21:00)");
+        }
+
+        if (bookingEndLocal.isAfter(endOffice) || bookingEndLocal.isBefore(startOffice)) {
+            throw new BadRequestParametersException("Booking end time must be within working hours (08:00 - 21:00)");
+        }
+
         if (startTime.compareTo(endTime) >= 0) {
             throw new BadRequestParametersException("Start time must be before end time");
         }
@@ -95,19 +133,27 @@ public class BookingService {
         return bookingMapper.toResponse(bookingRepository.save(booking));
     }
 
+    /**
+     * Allow cancel booking if user possesses it. Otherwise, throws exception.
+     *
+     * @param id
+     * @throws BadRequestParametersException if user does not possess the booking
+     * @throws EntityNotFoundException if booking with given id does not exist
+     */
+
     @Transactional
     public void cancelBooking(Long id) {
         Booking booking = bookingRepository.findById(id).orElseThrow(()
                 -> new EntityNotFoundException("Booking with ID: " + id + " not found"));
         User currentUser = getCurrentUser();
-        if (booking.getUser().getId().equals(currentUser.getId())) {
-            booking.setBookingStatus(Booking.BookingStatus.CANCELLED);
-            bookingRepository.save(booking);
-
-            getCurrentUser().setCountReservation(getCurrentUser().getCountReservation() - 1);
-        } else {
+        if (!booking.getUser().getId().equals(currentUser.getId())) {
             throw new BadRequestParametersException("You are not authorized to cancel this booking");
         }
+
+        // Mark booking cancelled and decrement reservation count for the owner
+        booking.setBookingStatus(Booking.BookingStatus.CANCELLED);
+        bookingRepository.save(booking);
+        currentUser.setCountReservation(currentUser.getCountReservation() - 1);
     }
 
     /**
@@ -120,8 +166,20 @@ public class BookingService {
      */
     @Transactional
     public void deleteBooking(Long id) {
-        getCurrentUser().setCountReservation(getCurrentUser().getCountReservation() - 1);
+        // Only decrement reservation count if the booking exists and belongs to the current user.
+        Booking booking = bookingRepository.findById(id).orElse(null);
+        if (booking == null) {
+            // Nothing to delete
+            return;
+        }
+
+        User currentUser = getCurrentUser();
+        if (!booking.getUser().getId().equals(currentUser.getId())) {
+            throw new BadRequestParametersException("You are not authorized to delete this booking");
+        }
+
         bookingRepository.deleteById(id);
+        currentUser.setCountReservation(currentUser.getCountReservation() - 1);
     }
 
     private User getCurrentUser() {
