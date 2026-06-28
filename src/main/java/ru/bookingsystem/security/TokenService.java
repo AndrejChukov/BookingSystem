@@ -52,6 +52,7 @@ public class TokenService {
                 .claim("username", user.getUsername())
                 .claim("email", user.getEmail())
                 .claim("id", user.getId())
+                .claim("countReservation", user.getCountReservation())
                 .build();
 
         return jwtEncoder.encode(JwtEncoderParameters.from(header, claims)).getTokenValue();

@@ -38,6 +38,7 @@ create table users (
     password varchar(255),
     username varchar(255),
     role varchar(50),
+    count_reservation integer default 0 not null,
     primary key (id));
 
 alter table if exists booking add constraint FKb6jhn9s6v53eb2cd9l7uhcd0m foreign key (room_id) references rooms;

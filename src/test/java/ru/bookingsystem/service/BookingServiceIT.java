@@ -183,6 +183,53 @@ public class BookingServiceIT {
     }
 
     @Test
+    public void deleteBooking_ShouldThrow_WhenNotOwner() {
+        User anotherUser = new User();
+        anotherUser.setUsername("anotheruser2");
+        anotherUser.setEmail("another2@example.com");
+        anotherUser.setPassword("password");
+        anotherUser.setRole(User.Role.USER);
+        userRepository.save(anotherUser);
+
+        // create booking for another user
+        setupSecurityContext(anotherUser);
+        Instant startTime = Instant.now().plus(1, ChronoUnit.HOURS);
+        Instant endTime = startTime.plus(2, ChronoUnit.HOURS);
+        bookingService.createBooking(new BookingRequestDTO(testRoom.getId(), startTime, endTime));
+
+        List<Booking> otherBookings = bookingRepository.findAllByUserId(anotherUser.getId());
+        assertEquals(1, otherBookings.size());
+
+        // switch back to test user and try to delete another user's booking
+        setupSecurityContext(testUser);
+
+        Long otherId = otherBookings.get(0).getId();
+        assertThrows(BadRequestParametersException.class, () -> bookingService.deleteBooking(otherId));
+    }
+
+    @Test
+    public void cancelBooking_ShouldCancelAndDecreaseCount() {
+        Instant startTime = Instant.now().plus(1, ChronoUnit.HOURS);
+        Instant endTime = startTime.plus(2, ChronoUnit.HOURS);
+
+        BookingResponseDTO created = bookingService
+                .createBooking(new BookingRequestDTO(testRoom.getId(), startTime, endTime));
+
+        List<Booking> saved = bookingRepository.findAllByUserId(testUser.getId());
+        assertEquals(1, saved.size());
+
+        Long id = saved.get(0).getId();
+
+        bookingService.cancelBooking(id);
+
+        Booking cancelled = bookingRepository.findById(id).orElseThrow();
+        assertEquals(Booking.BookingStatus.CANCELLED, cancelled.getBookingStatus());
+
+        User refreshed = userRepository.findById(testUser.getId()).orElseThrow();
+        assertEquals(0, refreshed.getCountReservation());
+    }
+
+    @Test
     public void deleteBooking_ShouldDeleteMultipleBookings_Sequentially() {
         Instant startTime1 = Instant.now().plus(1, ChronoUnit.HOURS);
         Instant endTime1 = startTime1.plus(2, ChronoUnit.HOURS);
