@@ -18,7 +18,6 @@ import ru.bookingsystem.repository.BookingRepository;
 import ru.bookingsystem.repository.RoomRepository;
 import ru.bookingsystem.repository.UserRepository;
 
-import java.awt.print.Book;
 import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -79,12 +78,36 @@ public class BookingService {
             throw new BadRequestParametersException("Current room is already booked for the given time range");
         }
 
+        User currentUser = getCurrentUser();
+
+        if (currentUser.getCountReservation() >= 3) {
+            throw new BadRequestParametersException("You have reached the maximum number of active bookings (3)");
+        }
+
         Booking booking = bookingMapper.toEntity(request);
         booking.setRoom(room);
-        booking.setUser(getCurrentUser());
+
+        booking.setUser(currentUser);
+        currentUser.setCountReservation(currentUser.getCountReservation() + 1);
+
         booking.setBookingStatus(Booking.BookingStatus.CONFIRMED);
 
         return bookingMapper.toResponse(bookingRepository.save(booking));
+    }
+
+    @Transactional
+    public void cancelBooking(Long id) {
+        Booking booking = bookingRepository.findById(id).orElseThrow(()
+                -> new EntityNotFoundException("Booking with ID: " + id + " not found"));
+        User currentUser = getCurrentUser();
+        if (booking.getUser().getId().equals(currentUser.getId())) {
+            booking.setBookingStatus(Booking.BookingStatus.CANCELLED);
+            bookingRepository.save(booking);
+
+            getCurrentUser().setCountReservation(getCurrentUser().getCountReservation() - 1);
+        } else {
+            throw new BadRequestParametersException("You are not authorized to cancel this booking");
+        }
     }
 
     /**
@@ -97,6 +120,7 @@ public class BookingService {
      */
     @Transactional
     public void deleteBooking(Long id) {
+        getCurrentUser().setCountReservation(getCurrentUser().getCountReservation() - 1);
         bookingRepository.deleteById(id);
     }
 

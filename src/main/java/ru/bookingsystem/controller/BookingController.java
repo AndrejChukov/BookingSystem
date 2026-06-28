@@ -55,6 +55,13 @@ public class BookingController {
         return bookingService.createBooking(request);
     }
 
+    @PutMapping(value = "/bookings/cancel/{id}")
+    @Operation(summary = "Cancel booking", description = "Cancel a booking for current user",
+            responses = {@ApiResponse(responseCode = "200", description = "Booking cancelled", content = @Content)})
+    public void cancelBooking(@PathVariable Long id) {
+        bookingService.cancelBooking(id);
+    }
+
     /**
      * Deletes a booking by its id.
      *
