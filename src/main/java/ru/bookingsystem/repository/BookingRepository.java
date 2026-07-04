@@ -27,6 +27,8 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     """)
     boolean existsOverlappingBookings(Long roomId, Instant startTime, Instant endTime);
 
+    int countByUserIdAndBookingStatus(Long userId, Booking.BookingStatus bookingStatus);
+
     @Modifying
     @Query("""
     UPDATE Booking b Set b.bookingStatus = 'COMPLETED'
