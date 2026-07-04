@@ -2,6 +2,8 @@ package ru.bookingsystem.config;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.jsontype.BasicPolymorphicTypeValidator;
+import com.fasterxml.jackson.databind.jsontype.PolymorphicTypeValidator;
 import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.cache.annotation.EnableCaching;
@@ -19,11 +21,20 @@ public class CacheConfig {
     @Bean
     public RedisCacheConfiguration cacheConfiguration() {
 
+        PolymorphicTypeValidator typeValidator = BasicPolymorphicTypeValidator.builder()
+                .allowIfBaseType(java.util.Collection.class)
+                .allowIfBaseType(java.util.Map.class)
+                .allowIfBaseType(Object[].class)
+                .allowIfSubType("ru.bookingsystem.")
+                .allowIfSubType("java.time.")
+                .allowIfSubType("java.util.")
+                .build();
+
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
 
         objectMapper.activateDefaultTyping(
-                LaissezFaireSubTypeValidator.instance,
+                typeValidator,
                 ObjectMapper.DefaultTyping.EVERYTHING,
                 JsonTypeInfo.As.PROPERTY
         );
