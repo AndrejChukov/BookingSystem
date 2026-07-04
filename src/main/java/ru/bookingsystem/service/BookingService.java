@@ -118,7 +118,7 @@ public class BookingService {
 
         User currentUser = getCurrentUser();
 
-        if (currentUser.getCountReservation() >= 3) {
+        if (bookingRepository.countByUserIdAndBookingStatus(currentUser.getId(), Booking.BookingStatus.CONFIRMED) >= 3) {
             throw new BadRequestParametersException("You have reached the maximum number of active bookings (3)");
         }
 
@@ -126,7 +126,6 @@ public class BookingService {
         booking.setRoom(room);
 
         booking.setUser(currentUser);
-        currentUser.setCountReservation(currentUser.getCountReservation() + 1);
 
         booking.setBookingStatus(Booking.BookingStatus.CONFIRMED);
 
@@ -150,10 +149,11 @@ public class BookingService {
             throw new BadRequestParametersException("You are not authorized to cancel this booking");
         }
 
-        // Mark booking cancelled and decrement reservation count for the owner
-        booking.setBookingStatus(Booking.BookingStatus.CANCELLED);
-        bookingRepository.save(booking);
-        currentUser.setCountReservation(currentUser.getCountReservation() - 1);
+        if (booking.getBookingStatus() != Booking.BookingStatus.CANCELLED &&
+            booking.getBookingStatus() != Booking.BookingStatus.COMPLETED) {
+            booking.setBookingStatus(Booking.BookingStatus.CANCELLED);
+            bookingRepository.save(booking);
+        }
     }
 
     /**
@@ -166,20 +166,10 @@ public class BookingService {
      */
     @Transactional
     public void deleteBooking(Long id) {
-        // Only decrement reservation count if the booking exists and belongs to the current user.
-        Booking booking = bookingRepository.findById(id).orElse(null);
-        if (booking == null) {
-            // Nothing to delete
-            return;
-        }
-
-        User currentUser = getCurrentUser();
-        if (!booking.getUser().getId().equals(currentUser.getId())) {
-            throw new BadRequestParametersException("You are not authorized to delete this booking");
-        }
-
+        bookingRepository.findById(id).orElseThrow(
+                () -> new EntityNotFoundException("Booking with ID: " + id + " not found")
+        );
         bookingRepository.deleteById(id);
-        currentUser.setCountReservation(currentUser.getCountReservation() - 1);
     }
 
     private User getCurrentUser() {

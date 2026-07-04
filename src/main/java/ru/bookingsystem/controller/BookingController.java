@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.media.Content;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import ru.bookingsystem.dto.request.BookingRequestDTO;
 import ru.bookingsystem.dto.response.BookingResponseDTO;
@@ -68,6 +69,7 @@ public class BookingController {
      * @param id booking id
      */
     @DeleteMapping("/bookings/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Delete booking", description = "Deletes booking with the given id",
             responses = {@ApiResponse(responseCode = "200", description = "Booking deleted", content = @Content)})
     public void deleteBooking(@PathVariable Long id) {
