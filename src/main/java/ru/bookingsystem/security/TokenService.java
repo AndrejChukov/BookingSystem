@@ -47,7 +47,7 @@ public class TokenService {
                 .subject(user.getUsername())
                 .issuer("bookingSystem")
                 .issuedAt(now)
-                .expiresAt(now.plus(jwtConfig.getExpirationTime(), ChronoUnit.MINUTES))
+                .expiresAt(now.plus(jwtConfig.getExpirationTime(), ChronoUnit.SECONDS))
                 .claim("roles", roles)
                 .claim("username", user.getUsername())
                 .claim("email", user.getEmail())
