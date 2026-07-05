@@ -35,12 +35,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handlePropertyReference(PropertyReferenceException ex) {
         ErrorResponse error = new ErrorResponse(
                 Instant.now(),
-                HttpStatus.NOT_FOUND.value(),
+                HttpStatus.BAD_REQUEST.value(),
                 "wrong property",
                 ex.getMessage()
         );
 
-        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(BadRequestParametersException.class)
