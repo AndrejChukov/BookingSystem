@@ -2,6 +2,7 @@ package ru.bookingsystem.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -169,6 +170,7 @@ public class BookingService {
      * @param id booking id to delete
      */
     @Transactional
+    @PreAuthorize("hasRole('ADMIN')")
     public void deleteBooking(Long id) {
         bookingRepository.findById(id).orElseThrow(
                 () -> new EntityNotFoundException("Booking with ID: " + id + " not found")
