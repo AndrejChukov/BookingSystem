@@ -1,6 +1,7 @@
 package ru.bookingsystem.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -45,6 +46,9 @@ public class BookingService {
     private final UserRepository userRepository;
     private final BookingMapper bookingMapper;
 
+    @Value("${spring.application.timeZoneCity}")
+    private String timeZoneCity;
+
     /**
      * Returns list of bookings that belong to the currently authenticated user.
      *
@@ -81,7 +85,7 @@ public class BookingService {
 
         LocalTime startOffice = LocalTime.of(8, 0);
         LocalTime endOffice = LocalTime.of(21, 0);
-        ZoneId localZone = ZoneId.systemDefault();
+        ZoneId localZone = ZoneId.of(timeZoneCity);
 
         LocalTime bookingStartLocal = startTime.atZone(localZone).toLocalTime();
         LocalTime bookingEndLocal = endTime.atZone(localZone).toLocalTime();
