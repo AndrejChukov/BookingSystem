@@ -1,6 +1,7 @@
 spring:
   application:
     name: bookingsystem
+    timeZoneCity: ${TIME_ZONE_CITY}
   jpa:
     hibernate:
       ddl-auto: validate
