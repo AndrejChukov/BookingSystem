@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.bookingsystem.dto.request.EquipmentRequestDTO;
@@ -25,6 +26,7 @@ public class EquipmentService {
     private final EquipmentMapper equipmentMapper;
 
     @Transactional(readOnly = true)
+    @PreAuthorize("hasAnyRole('ADMIN', 'WORKER')")
     @Cacheable(value = "equipment")
     public List<EquipmentResponseDTO> getAllEquipments() {
         log.debug("Fetching all equipments");
@@ -34,6 +36,7 @@ public class EquipmentService {
     }
 
     @Transactional(readOnly = true)
+    @PreAuthorize("hasAnyRole('ADMIN', 'WORKER')")
     @Cacheable(value = "equipment", key = "#id")
     public EquipmentResponseDTO getEquipmentById(Long id) {
         log.debug("Fetching equipment by id={}", id);
@@ -42,6 +45,7 @@ public class EquipmentService {
     }
 
     @Transactional
+    @PreAuthorize("hasAnyRole('ADMIN', 'WORKER')")
     @CacheEvict(value = "equipment", allEntries = true)
     public EquipmentResponseDTO createEquipment(EquipmentRequestDTO equipmentRequest) {
         log.info("Creating equipment {}", equipmentRequest);
@@ -52,6 +56,7 @@ public class EquipmentService {
     }
 
     @Transactional
+    @PreAuthorize("hasAnyRole('ADMIN', 'WORKER')")
     @CacheEvict(value = "equipment", allEntries = true)
     public void updateEquipment(EquipmentRequestDTO equipmentRequest, Long id) {
         log.info("Updating equipment id={} with {}", id, equipmentRequest);
@@ -64,6 +69,7 @@ public class EquipmentService {
     }
 
     @Transactional
+    @PreAuthorize("hasAnyRole('ADMIN', 'WORKER')")
     @CacheEvict(value = "equipment", allEntries = true)
     public void deleteEquipment(Long id) {
         log.info("Deleting equipment id={}", id);

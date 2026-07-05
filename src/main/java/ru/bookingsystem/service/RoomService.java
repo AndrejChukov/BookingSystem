@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.bookingsystem.dto.request.RoomRequestDTO;
@@ -56,6 +57,7 @@ public class RoomService {
     }
 
     @Transactional
+    @PreAuthorize("hasRole('ADMIN')")
     @CacheEvict(value = "rooms", allEntries = true)
     public RoomDetailResponseDTO createRoom(RoomRequestDTO roomRequest) {
         log.info("Creating room: {}", roomRequest);
@@ -67,6 +69,7 @@ public class RoomService {
     }
 
     @Transactional
+    @PreAuthorize("hasAnyRole('ADMIN', 'WORKER')")
     @CacheEvict(value = "rooms", allEntries = true)
     public void updateRoom(RoomRequestDTO roomRequest, Long id) {
         log.info("Updating room id={} with {}", id, roomRequest);
@@ -81,6 +84,7 @@ public class RoomService {
     }
 
     @Transactional
+    @PreAuthorize("hasRole('ADMIN')")
     @CacheEvict(value = "rooms", allEntries = true)
     public void deleteRoom(Long id) {
         log.info("Deleting room id={}", id);
