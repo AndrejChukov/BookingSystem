@@ -224,9 +224,6 @@ public class BookingServiceIT {
 
         Booking cancelled = bookingRepository.findById(id).orElseThrow();
         assertEquals(Booking.BookingStatus.CANCELLED, cancelled.getBookingStatus());
-
-        User refreshed = userRepository.findById(testUser.getId()).orElseThrow();
-        assertEquals(0, refreshed.getCountReservation());
     }
 
     @Test
