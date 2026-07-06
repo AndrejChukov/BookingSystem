@@ -24,7 +24,7 @@ import java.util.List;
  * require ADMIN or WORKER role authentication, except where explicitly noted.
  *
  * <p>Endpoints:
- * - GET    /api/equipments      : retrieve all equipment
+ * - GET    /api/equipment      : retrieve all equipment
  * - GET    /api/equipment/{id}  : retrieve equipment by id
  * - POST   /api/equipment       : create new equipment
  * - PUT    /api/equipment/{id}  : update existing equipment
@@ -46,12 +46,12 @@ public class EquipmentController {
      *
      * @return list of all EquipmentResponseDTO objects
      */
-    @GetMapping(value = "/equipments", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/equipment", produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasAnyRole('ADMIN', 'WORKER')")
     @Operation(summary = "Get all equipment", description = "Retrieve all equipment records",
             responses = {@ApiResponse(responseCode = "200", description = "List of equipment", content = @Content)})
     public List<EquipmentResponseDTO> getAllEquipments() {
-        log.info("GET /api/equipments");
+        log.info("GET /api/equipment");
         return equipmentService.getAllEquipments();
     }
 
