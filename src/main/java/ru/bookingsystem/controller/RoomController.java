@@ -99,14 +99,14 @@ public class RoomController {
      * @return RoomDetailResponseDTO with full room information and equipment list
      * @throws ru.bookingsystem.exception.EntityNotFoundException if room with given id not found
      */
-    @GetMapping(value = "/room/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/rooms/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Get room by id", description = "Retrieve detailed room information (Authentication required endpoint)",
             responses = {@ApiResponse(responseCode = "200", description = "Room found", content = @Content),
                     @ApiResponse(responseCode = "401", description = "Unauthorized"),
                     @ApiResponse(responseCode = "403", description = "Forbidden"),
                     @ApiResponse(responseCode = "404", description = "Room not found")})
     public RoomDetailResponseDTO getRoomById(@Parameter(description = "Room id") @PathVariable("id") Long id) {
-        log.info("GET /api/room/{}", id);
+        log.info("GET /api/rooms/{}", id);
         return roomService.getRoomById(id);
     }
 
@@ -120,14 +120,14 @@ public class RoomController {
      * @return created RoomDetailResponseDTO with assigned id
      * @throws ru.bookingsystem.exception.EntityNotFoundException if any specified equipment not found
      */
-    @PostMapping(value = "/room", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/rooms", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Create room", description = "Create a new room (requires ADMIN role)",
             responses = {@ApiResponse(responseCode = "200", description = "Room created", content = @Content),
                     @ApiResponse(responseCode = "401", description = "Unauthorized"),
                     @ApiResponse(responseCode = "403", description = "Forbidden")})
     public RoomDetailResponseDTO createRoom(@Valid @RequestBody RoomRequestDTO roomRequest) {
-        log.info("POST /api/room request={}", roomRequest);
+        log.info("POST /api/rooms request={}", roomRequest);
         return roomService.createRoom(roomRequest);
     }
 
@@ -141,7 +141,7 @@ public class RoomController {
      * @param id room identifier to update
      * @throws ru.bookingsystem.exception.EntityNotFoundException if room or equipment not found
      */
-    @PutMapping(value = "/room/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(value = "/rooms/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasAnyRole('ADMIN', 'WORKER')")
     @Operation(summary = "Update room", description = "Update an existing room (requires ADMIN/WORKER role)",
             responses = {@ApiResponse(responseCode = "200", description = "Room updated", content = @Content),
@@ -150,7 +150,7 @@ public class RoomController {
                     @ApiResponse(responseCode = "404", description = "Room not found")})
     public void updateRoom(@Valid @RequestBody RoomRequestDTO roomRequest, 
                            @Parameter(description = "Room id") @PathVariable("id") Long id) {
-        log.info("PUT /api/room/{} request={}", id, roomRequest);
+        log.info("PUT /api/rooms/{} request={}", id, roomRequest);
         roomService.updateRoom(roomRequest, id);
     }
 
@@ -162,7 +162,7 @@ public class RoomController {
      * @param id room identifier to delete
      * @throws ru.bookingsystem.exception.EntityNotFoundException if room with given id not found
      */
-    @DeleteMapping("/room/{id}")
+    @DeleteMapping("/rooms/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Delete room", description = "Delete room record by identifier (requires ADMIN role)",
             responses = {@ApiResponse(responseCode = "200", description = "Room deleted", content = @Content),
@@ -170,7 +170,7 @@ public class RoomController {
                     @ApiResponse(responseCode = "403", description = "Forbidden"),
                     @ApiResponse(responseCode = "404", description = "Room not found")})
     public void deleteRoom(@Parameter(description = "Room id") @PathVariable Long id) {
-        log.info("DELETE /api/room/{}", id);
+        log.info("DELETE /api/rooms/{}", id);
         roomService.deleteRoom(id);
     }
 
