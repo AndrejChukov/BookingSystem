@@ -83,12 +83,12 @@ public class UserController {
      * @return Map containing JWT claims for the current authenticated user
      * @throws ru.bookingsystem.exception.EntityNotFoundException if user not authenticated
      */
-    @GetMapping(value = "/user", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/users", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Get current user", description = "Retrieve information about currently authenticated user",
             responses = {@ApiResponse(responseCode = "200", description = "User information", content = @Content),
                     @ApiResponse(responseCode = "401", description = "User not authenticated")})
     public Map<String, Object> getUser() {
-        log.info("GET /api/user current user info requested");
+        log.info("GET /api/users current user info requested");
         return userService.getUser();
     }
 
