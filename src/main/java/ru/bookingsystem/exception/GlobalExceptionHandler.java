@@ -106,19 +106,4 @@ public class GlobalExceptionHandler {
         );
         return new ResponseEntity<>(error, HttpStatus.FORBIDDEN);
     }
-
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> handleGenericException(Exception ex) {
-        log.error("An unexpected error occurred", ex);
-
-        ErrorResponse error = new ErrorResponse(
-                Instant.now(),
-                HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                "Internal server error",
-                ex.getMessage()
-        );
-
-        return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-
 }
