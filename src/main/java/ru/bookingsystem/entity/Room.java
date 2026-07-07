@@ -17,7 +17,8 @@ import java.util.List;
 @Table(name = "rooms")
 public class Room extends BaseEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "rooms_seq")
+    @SequenceGenerator(name = "rooms_seq_gen", sequenceName = "rooms_seq", allocationSize = 50)
     @EqualsAndHashCode.Include
     private Long id;
     private String name;

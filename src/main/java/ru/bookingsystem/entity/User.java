@@ -20,7 +20,8 @@ import java.util.List;
 @Table(name = "users")
 public class User extends BaseEntity implements UserDetails {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "users_seq")
+    @SequenceGenerator(name = "users_seq_gen", sequenceName = "users_seq", allocationSize = 50)
     @EqualsAndHashCode.Include
     private Long id;
     private String username;
