@@ -13,10 +13,11 @@ import java.time.Instant;
 @Setter
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity
-@Table(name = "equipments")
+@Table(name = "equipment")
 public class Equipment extends BaseEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "equipment_seq")
+    @SequenceGenerator(name = "equipment_seq_gen", sequenceName = "equipment_seq", allocationSize = 50)
     @EqualsAndHashCode.Include
     private Long id;
     private String name;
