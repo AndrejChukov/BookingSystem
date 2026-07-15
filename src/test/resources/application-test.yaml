@@ -1,0 +1,16 @@
+spring:
+  application:
+    name: bookingsystem
+    timeZoneCity: Europe/Moscow
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        default_batch_fetch_size: 20
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+  security:
+    jwt:
+      secret-key: test-secret-key-for-integration-tests-only-32chars
+      expiration-time: 3600
+      algorithm: HS256
