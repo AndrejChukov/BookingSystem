@@ -1,13 +1,7 @@
 package ru.bookingsystem;
 
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
+import ru.bookingsystem.support.AbstractIntegrationTest;
 
-@SpringBootTest(classes = BookingsystemApplication.class)
-class BookingsystemApplicationTests {
-
-    @Test
-    void contextLoads() {
-    }
-
+class BookingsystemApplicationTests extends AbstractIntegrationTest {
+    // Context loads with Testcontainers-backed PostgreSQL and Redis.
 }
